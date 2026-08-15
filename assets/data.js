@@ -1,10 +1,1 @@
-window.GMAX_PRODUCTS = [
-{id:'d1',name:'Dell Latitude Business Laptop',category:'Laptops',brand:'Dell',price:650000,old_price:695000,featured:true,in_stock:true,demo:true,icon:'💻',description:'Demo item. Replace with current GMAX stock, price and specifications before public launch.',specs:{Processor:'Intel Core i5',Memory:'16GB RAM',Storage:'512GB SSD'}},
-{id:'d2',name:'HP EliteBook Business Laptop',category:'Laptops',brand:'HP',price:720000,featured:true,in_stock:true,demo:true,icon:'💻',description:'Demo item. Replace with current GMAX stock before launch.',specs:{Processor:'Intel Core i5',Memory:'16GB RAM',Storage:'512GB SSD'}},
-{id:'d3',name:'Samsung Galaxy Smartphone',category:'Phones & Tablets',brand:'Samsung',price:485000,old_price:510000,featured:true,in_stock:true,demo:true,icon:'📱',description:'Demo phone entry. Add the exact model and current price from Admin.',specs:{Network:'5G',Storage:'256GB'}},
-{id:'d4',name:'Android Tablet',category:'Phones & Tablets',brand:'Generic',price:285000,featured:false,in_stock:true,demo:true,icon:'📱',description:'Demo tablet entry.',specs:{Display:'10-inch',Storage:'128GB'}},
-{id:'d5',name:'HP LaserJet Office Printer',category:'Office Equipment',brand:'HP',price:380000,old_price:410000,featured:true,in_stock:true,demo:true,icon:'🖨️',description:'Demo office equipment entry.',specs:{Type:'Laser Printer',Connectivity:'USB / Network'}},
-{id:'d6',name:'Dual-Band Wi-Fi 6 Router',category:'Networking Gadgets',brand:'TP-Link',price:145000,featured:true,in_stock:true,demo:true,icon:'📡',description:'Demo networking entry.',specs:{Standard:'Wi-Fi 6',Ports:'Gigabit Ethernet'}},
-{id:'d7',name:'1200VA Backup UPS',category:'Home Appliances',brand:'APC',price:185000,old_price:205000,featured:false,in_stock:true,demo:true,icon:'🔋',description:'Demo power solution entry.',specs:{Capacity:'1200VA',Use:'Home / Office'}},
-{id:'d8',name:'43-inch Smart Television',category:'Home Appliances',brand:'Hisense',price:410000,featured:false,in_stock:true,demo:true,icon:'📺',description:'Demo home appliance entry.',specs:{Display:'43-inch',Type:'Smart TV'}}
-];
+window.GMAX_PRODUCTS = [];
