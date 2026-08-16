@@ -3,7 +3,8 @@ function toast(t){const e=$('.toast');if(!e)return;e.textContent=t;e.classList.a
 function cart(){try{return JSON.parse(localStorage.getItem('gmax_cart')||'[]')}catch{return[]}}
 function save(c){localStorage.setItem('gmax_cart',JSON.stringify(c));count()}
 function count(){const n=cart().reduce((s,i)=>s+i.qty,0);$$('[data-cart-count]').forEach(e=>e.textContent=n)}
-function art(p){return p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:`<div class="product-emoji">🔌</div>`}
+function imagesFor(p){let list=[];if(Array.isArray(p?.image_urls))list=p.image_urls.filter(Boolean);if(!list.length&&p?.image_url)list=[p.image_url];return list.slice(0,4)}
+function art(p){const imgs=imagesFor(p);return imgs[0]?`<img src="${esc(imgs[0])}" alt="${esc(p.name)}">`:`<div class="product-emoji">🔌</div>`}
 function card(p){return `<article class="product"><div class="product-image">${art(p)}${p.featured?'<span class="badge">Featured</span>':''}<span class="badge ${p.in_stock===false?'out':'stock'}">${p.in_stock===false?'Out of stock':'In stock'}</span></div><div class="product-body"><div class="product-cat">${esc(p.category||'Products')}</div><h3>${esc(p.name)}</h3><div class="price-row"><span class="price">${fmt(p.price)}</span>${p.old_price?`<span class="old">${fmt(p.old_price)}</span>`:''}</div><div class="product-actions"><button class="add" data-add="${esc(p.id)}">Add to cart</button><button class="view" data-view="${esc(p.id)}">⌕</button></div></div></article>`}
 function renderEmpty(el,message){if(el)el.innerHTML=`<div class="empty" style="grid-column:1/-1">${esc(message)}</div>`}
 async function load(){
@@ -30,7 +31,61 @@ function renderFeatured(){const e=$('#featured-products');if(!e)return;if(!produ
 function renderNewArrivals(){const e=$('#new-arrivals');if(!e)return;if(!products.length)return renderEmpty(e,'New products will appear here after they are added from Admin.');e.innerHTML=products.slice(0,8).map(card).join('');bind()}
 function setupFilters(){const cat=$('#filter-category'),brand=$('#filter-brand');if(!cat||!brand)return;cat.innerHTML='<option value="">All categories</option>';brand.innerHTML='<option value="">All brands</option>';[...new Set(products.map(p=>p.category).filter(Boolean))].sort().forEach(v=>cat.insertAdjacentHTML('beforeend',`<option>${esc(v)}</option>`));[...new Set(products.map(p=>p.brand).filter(Boolean))].sort().forEach(v=>brand.insertAdjacentHTML('beforeend',`<option>${esc(v)}</option>`));['#shop-search','#filter-category','#filter-brand','#filter-sort'].forEach(s=>{const el=$(s);if(el)el.addEventListener(s==='#shop-search'?'input':'change',renderShop)})}
 function renderShop(){const shop=$('#shop-products');if(!shop)return;let list=[...products],q=($('#shop-search')?.value||'').toLowerCase().trim(),c=$('#filter-category')?.value||'',b=$('#filter-brand')?.value||'',s=$('#filter-sort')?.value||'';if(q)list=list.filter(p=>`${p.name} ${p.category} ${p.brand||''}`.toLowerCase().includes(q));if(c)list=list.filter(p=>p.category===c);if(b)list=list.filter(p=>p.brand===b);if(s==='low')list.sort((a,b)=>Number(a.price)-Number(b.price));if(s==='high')list.sort((a,b)=>Number(b.price)-Number(a.price));const r=$('#result-count');if(r)r.textContent=`${list.length} product${list.length===1?'':'s'}`;shop.innerHTML=list.length?list.map(card).join(''):'<div class="empty">No products are available here yet.</div>';bind()}
-function view(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;let specs=p.specs||{};if(typeof specs==='string')try{specs=JSON.parse(specs)}catch{specs={}};$('#product-modal-content').innerHTML=`<div class="product-image" style="height:260px;border-radius:16px">${art(p)}</div><div class="product-cat" style="margin-top:18px">${esc(p.category)}</div><h2 style="color:var(--navy);margin:6px 0">${esc(p.name)}</h2><div class="price-row"><span class="price">${fmt(p.price)}</span>${p.old_price?`<span class="old">${fmt(p.old_price)}</span>`:''}</div><p style="color:var(--muted);line-height:1.7">${esc(p.description||'')}</p><div class="specs">${Object.entries(specs).map(([k,v])=>`<div class="spec"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}</div><button class="btn btn-primary" id="modal-add">Add to cart</button>`;$('#modal-add').onclick=()=>{add(id);$('#product-modal').classList.remove('show')};$('#product-modal').classList.add('show')}
+function view(id){
+  const p=products.find(x=>String(x.id)===String(id));
+  if(!p)return;
+
+  let specs=p.specs||{};
+  if(typeof specs==='string')try{specs=JSON.parse(specs)}catch{specs={}}
+
+  const imgs=imagesFor(p);
+
+  const gallery=imgs.length
+    ? `<div class="product-gallery">
+         <div class="gallery-main">
+           <img id="gallery-main-image" src="${esc(imgs[0])}" alt="${esc(p.name)}">
+         </div>
+         ${imgs.length>1?`
+           <div class="gallery-thumbs">
+             ${imgs.map((u,i)=>`
+               <button class="gallery-thumb ${i===0?'active':''}" data-gallery-src="${esc(u)}" aria-label="View product photo ${i+1}">
+                 <img src="${esc(u)}" alt="${esc(p.name)} photo ${i+1}">
+               </button>`).join('')}
+           </div>`:''}
+       </div>`
+    : `<div class="product-image" style="height:260px;border-radius:16px"><div class="product-emoji">🔌</div></div>`;
+
+  $('#product-modal-content').innerHTML=`
+    ${gallery}
+    <div class="product-cat" style="margin-top:18px">${esc(p.category)}</div>
+    <h2 style="color:var(--navy);margin:6px 0">${esc(p.name)}</h2>
+    <div class="price-row">
+      <span class="price">${fmt(p.price)}</span>
+      ${p.old_price?`<span class="old">${fmt(p.old_price)}</span>`:''}
+    </div>
+    <p style="color:var(--muted);line-height:1.7">${esc(p.description||'')}</p>
+    <div class="specs">
+      ${Object.entries(specs).map(([k,v])=>`
+        <div class="spec"><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('')}
+    </div>
+    <button class="btn btn-primary" id="modal-add">Add to cart</button>`;
+
+  $$('.gallery-thumb',$('#product-modal-content')).forEach(btn=>{
+    btn.onclick=()=>{
+      const main=$('#gallery-main-image');
+      if(main)main.src=btn.dataset.gallerySrc;
+      $$('.gallery-thumb',$('#product-modal-content')).forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+    };
+  });
+
+  $('#modal-add').onclick=()=>{
+    add(id);
+    $('#product-modal').classList.remove('show');
+  };
+
+  $('#product-modal').classList.add('show');
+}
 function startFloatingRecommendations(){
   const eligible=products.filter(p=>p.in_stock!==false);
   if(!eligible.length||$('#gmax-suggestion'))return;
