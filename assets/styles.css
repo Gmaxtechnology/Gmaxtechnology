@@ -316,3 +316,125 @@
   .delivery-choice{grid-template-columns:1fr}
   .receipt-grid{grid-template-columns:1fr}
 }
+
+
+/* ===== PRODUCT DETAILS / CLICKABLE PRODUCT IMAGE ===== */
+.product-image-clickable{cursor:pointer}
+.product-image-clickable:focus{outline:3px solid rgba(18,104,232,.22);outline-offset:2px}
+.product-title-link{
+  display:block;
+  width:100%;
+  border:0;
+  padding:0;
+  margin:7px 0 12px;
+  background:none;
+  color:var(--navy);
+  text-align:left;
+  font-weight:800;
+  font-size:15px;
+  line-height:1.4;
+  cursor:pointer;
+}
+.product-title-link:hover{color:var(--blue)}
+.detail-stock{
+  display:inline-block;
+  margin:10px 0 3px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#e5f8ef;
+  color:#087653;
+  font-size:11px;
+  font-weight:850;
+}
+.detail-purchase{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:20px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#f8fbff;
+}
+.detail-option label{
+  display:block;
+  margin-bottom:7px;
+  color:#53677e;
+  font-size:11px;
+  font-weight:850;
+}
+.detail-option select{
+  width:100%;
+  height:42px;
+  border:1px solid #dce5ef;
+  border-radius:10px;
+  padding:0 10px;
+  background:#fff;
+}
+.detail-qty{
+  display:grid;
+  grid-template-columns:42px 1fr 42px;
+  gap:6px;
+}
+.detail-qty button,.detail-qty input{
+  height:42px;
+  border:1px solid #dce5ef;
+  border-radius:9px;
+  background:#fff;
+  text-align:center;
+}
+.detail-qty button{
+  cursor:pointer;
+  color:var(--navy);
+  font-weight:900;
+  font-size:18px;
+}
+.detail-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+.cart-meta{
+  margin-top:4px;
+  color:#64748b;
+  font-size:11px;
+}
+.suggest-img-button{
+  border:0;
+  padding:0;
+  cursor:pointer;
+}
+
+/* ===== ADMIN NOTIFICATION BADGES ===== */
+.admin-side button{
+  position:relative;
+}
+.admin-badge{
+  display:inline-grid;
+  place-items:center;
+  min-width:19px;
+  height:19px;
+  padding:0 5px;
+  margin-left:6px;
+  border-radius:999px;
+  background:#dc3545;
+  color:#fff;
+  font-size:10px;
+  font-weight:950;
+  line-height:1;
+}
+.status-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:850;
+}
+.status-new{background:#ffe4e6;color:#b4232d}
+.status-done{background:#e5f8ef;color:#087653}
+
+@media(max-width:620px){
+  .detail-purchase,.detail-actions{grid-template-columns:1fr}
+}
