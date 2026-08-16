@@ -205,3 +205,114 @@
     height:62px;
   }
 }
+
+
+/* ===== DELIVERY CHECKOUT ===== */
+.delivery-choice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.delivery-choice label{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  cursor:pointer;
+  background:#fff;
+}
+.delivery-choice label:has(input:checked){
+  border-color:var(--blue);
+  background:#eef6ff;
+}
+.delivery-choice input{margin-top:3px}
+.delivery-choice b,.delivery-choice small{display:block}
+.delivery-choice small{margin-top:4px;color:var(--muted);line-height:1.4}
+.delivery-fields{
+  border:1px solid #d6e6f8;
+  border-radius:14px;
+  padding:15px;
+  background:#f7fbff;
+}
+.delivery-note{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:9px;
+  background:#fff4cf;
+  color:#755900;
+  font-size:12px;
+  line-height:1.5;
+}
+.order-success{
+  background:#e4f8ef;
+  border:1px solid #bcebd5;
+  color:#087653;
+  padding:12px;
+  border-radius:10px;
+  line-height:1.55;
+}
+
+/* ===== PAYMENT RECEIPT ===== */
+.receipt-grid{
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:25px;
+  align-items:start;
+}
+.receipt-info{
+  background:var(--navy);
+  color:#fff;
+  border-radius:22px;
+  padding:25px;
+}
+.receipt-info h3{margin-top:0}
+.receipt-info ol{
+  padding-left:20px;
+  color:#c6d8eb;
+  line-height:1.75;
+}
+.receipt-warning{
+  margin-top:18px;
+  padding:12px;
+  border-radius:10px;
+  background:rgba(255,211,61,.14);
+  color:#ffe58b;
+  font-size:12px;
+  line-height:1.55;
+}
+.receipt-form{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:24px;
+}
+.notice{
+  background:#eef4fb;
+  color:var(--navy);
+  padding:11px 12px;
+  border-radius:9px;
+  font-size:12px;
+  line-height:1.5;
+}
+.notice.ok{background:#e3f8ee;color:#087653}
+.notice.bad{background:#ffeaeb;color:#a52e36}
+
+.quote-input{
+  width:120px;
+  padding:8px;
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+.order-status-select{
+  min-width:145px;
+  padding:8px;
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+
+@media(max-width:760px){
+  .delivery-choice{grid-template-columns:1fr}
+  .receipt-grid{grid-template-columns:1fr}
+}

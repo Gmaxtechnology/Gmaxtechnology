@@ -291,19 +291,91 @@ $('#product-form').onsubmit=async e=>{
 };
 
 async function loadOrders(){
-  const {data}=await client
+  const {data,error}=await client
     .from('orders')
     .select('*')
     .order('created_at',{ascending:false})
     .limit(100);
 
-  $('#orders-body').innerHTML=(data||[]).map(o=>`
-    <tr>
+  if(error)return note(error.message,false);
+
+  $('#orders-body').innerHTML=(data||[]).map(o=>{
+    const subtotal=Number(o.subtotal??o.total??0);
+    const fee=o.delivery_fee===null||o.delivery_fee===undefined?'':Number(o.delivery_fee);
+    const total=Number(o.total??subtotal);
+    const delivery=o.delivery_method==='home_delivery'
+      ? `<b>Home Delivery</b><br><small>${o.delivery_address||o.address||''}<br>${o.delivery_city||''}, ${o.delivery_state||''}<br>Landmark: ${o.delivery_landmark||'-'}</small>`
+      : '<b>Store Pickup</b>';
+    return `<tr>
       <td><b>${o.order_number}</b><br><small>${new Date(o.created_at).toLocaleString()}</small></td>
       <td>${o.customer_name}<br><small>${o.phone}</small></td>
-      <td>${fmt(o.total)}</td>
-      <td>${o.status}</td>
-    </tr>`).join('');
+      <td>${delivery}</td>
+      <td>${fmt(subtotal)}</td>
+      <td>${o.delivery_method==='home_delivery'
+        ? `<input class="quote-input" type="number" min="0" data-fee="${o.id}" value="${fee}" placeholder="Courier fee">`
+        : '₦0'}</td>
+      <td><b>${fmt(total)}</b></td>
+      <td>
+        <select class="order-status-select" data-status="${o.id}">
+          ${['new','delivery_quote_pending','quoted','payment_pending','paid_verified','processing','dispatched','completed','cancelled']
+            .map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s.replaceAll('_',' ')}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        ${o.delivery_method==='home_delivery'?`<button class="mini edit" data-save-quote="${o.id}">Save quote</button>`:''}
+        <button class="mini edit" data-wa-order="${o.id}">WhatsApp</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  $$('[data-save-quote]').forEach(b=>b.onclick=()=>saveQuote(b.dataset.saveQuote,data||[]));
+  $$('[data-status]').forEach(s=>s.onchange=()=>saveStatus(s.dataset.status,s.value));
+  $$('[data-wa-order]').forEach(b=>b.onclick=()=>whatsAppOrder(b.dataset.waOrder,data||[]));
+}
+
+async function saveQuote(id,orders){
+  const o=orders.find(x=>x.id===id);
+  if(!o)return;
+  const input=document.querySelector(`[data-fee="${id}"]`);
+  const fee=Number(input?.value);
+  if(!Number.isFinite(fee)||fee<0)return note('Enter a valid courier fee.',false);
+
+  const subtotal=Number(o.subtotal??o.total??0);
+  const total=subtotal+fee;
+  const {error}=await client.from('orders').update({
+    delivery_fee:fee,
+    total,
+    delivery_status:'quoted',
+    status:'quoted'
+  }).eq('id',id);
+
+  if(error)return note(error.message,false);
+  note('Courier quote saved. Final total: '+fmt(total));
+  await loadOrders();
+}
+
+async function saveStatus(id,status){
+  const payment_status=status==='paid_verified'?'verified':undefined;
+  const patch={status};
+  if(payment_status)patch.payment_status=payment_status;
+  const {error}=await client.from('orders').update(patch).eq('id',id);
+  if(error)return note(error.message,false);
+  note('Order status updated.');
+}
+
+function whatsAppOrder(id,orders){
+  const o=orders.find(x=>x.id===id);
+  if(!o)return;
+  const phone=String(o.phone||'').replace(/\D/g,'');
+  if(!phone)return note('This order has no usable phone number.',false);
+  const subtotal=Number(o.subtotal??o.total??0);
+  const fee=Number(o.delivery_fee||0);
+  const total=Number(o.total??subtotal+fee);
+  const delivery=o.delivery_method==='home_delivery'
+    ? `Home Delivery\nCourier fee: ${o.delivery_fee==null?'Awaiting quote':fmt(fee)}`
+    : 'Store Pickup\nDelivery fee: ₦0';
+  const text=`Hello ${o.customer_name||''}, this is GMAX Technology.\n\nOrder: ${o.order_number}\nSubtotal: ${fmt(subtotal)}\n${delivery}\nFinal amount: ${fmt(total)}\n\n${o.delivery_method==='home_delivery'&&o.delivery_fee==null?'We are still obtaining your courier quotation. Please do not pay yet.':'If you have not paid yet, please pay only this confirmed amount. After payment, use the Payment Receipt section on our website.'}`;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`,'_blank');
 }
 
 async function loadMessages(){

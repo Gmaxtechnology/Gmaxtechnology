@@ -113,5 +113,139 @@ if($('#mobile-menu'))$('#mobile-menu').onclick=()=>$('#navlinks').classList.togg
 $$('[data-cat-link]').forEach(a=>a.addEventListener('click',()=>{const c=a.dataset.catLink;setTimeout(()=>{if($('#filter-category')){$('#filter-category').value=c;renderShop()}},50)}));
 if($('#global-search'))$('#global-search').onsubmit=e=>{e.preventDefault();const q=$('#global-search-input').value;location.hash='shop';if($('#shop-search')){$('#shop-search').value=q;renderShop()}};
 if($('#contact-form'))$('#contact-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),o=Object.fromEntries(f.entries());if(configured()&&window.supabase){try{if(!client)client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const{error}=await client.from('contact_messages').insert(o);if(!error){e.target.reset();return toast('Message sent successfully.')}}catch{}}const text=`Website enquiry from ${o.name}\nPhone: ${o.phone||'-'}\nEmail: ${o.email}\nSubject: ${o.subject}\n\n${o.message}`;window.open(`https://wa.me/${cfg.WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`,'_blank')};
-if($('#checkout-form'))$('#checkout-form').onsubmit=async e=>{e.preventDefault();const c=cart();if(!c.length)return toast('Your cart is empty.');const f=new FormData(e.target),total=c.reduce((s,i)=>s+i.price*i.qty,0),no='GMAX-'+Date.now().toString().slice(-8),order={order_number:no,customer_name:f.get('name'),phone:f.get('phone'),email:f.get('email'),address:f.get('address'),notes:f.get('notes'),items:c,total,status:'new'};if(configured()&&window.supabase){try{if(!client)client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);await client.from('orders').insert(order)}catch{}}const lines=c.map(i=>`• ${i.name} × ${i.qty} — ${fmt(i.price*i.qty)}`).join('\n');const text=`Hello GMAX Technology, I want to place an order.\n\nOrder: ${no}\nCustomer: ${order.customer_name}\nPhone: ${order.phone}\nEmail: ${order.email||'-'}\nAddress: ${order.address}\n\n${lines}\n\nTotal: ${fmt(total)}\nNotes: ${order.notes||'-'}`;window.open(`https://wa.me/${cfg.WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`,'_blank')};
+function digitsOnly(v){return String(v||'').replace(/\D/g,'')}
+function selectedDelivery(){return document.querySelector('input[name="delivery_method"]:checked')?.value||'pickup'}
+function setDeliveryFields(){
+  const method=selectedDelivery();
+  const box=$('#home-delivery-fields');
+  const summary=$('#delivery-summary');
+  if(box)box.hidden=method!=='home_delivery';
+  if(summary)summary.textContent=method==='home_delivery'?'Awaiting courier quotation':'Store pickup: ₦0';
+  if(box){
+    ['delivery_state','delivery_city','delivery_address'].forEach(n=>{
+      const el=document.querySelector(`[name="${n}"]`);
+      if(el)el.required=method==='home_delivery';
+    });
+  }
+}
+document.querySelectorAll('input[name="delivery_method"]').forEach(r=>r.addEventListener('change',setDeliveryFields));
+setDeliveryFields();
+
+if($('#checkout-form'))$('#checkout-form').onsubmit=async e=>{
+  e.preventDefault();
+  const c=cart();
+  if(!c.length)return toast('Your cart is empty.');
+
+  const f=new FormData(e.target);
+  const method=f.get('delivery_method')||'pickup';
+  const subtotal=c.reduce((s,i)=>s+i.price*i.qty,0);
+  const no='GMAX-'+Date.now().toString().slice(-8);
+
+  if(method==='home_delivery' && (!f.get('delivery_state')||!f.get('delivery_city')||!f.get('delivery_address'))){
+    return toast('Please complete the home delivery address.');
+  }
+
+  const address=method==='pickup'
+    ? 'Store Pickup — GMAX Technology, Ikeja, Lagos'
+    : `${f.get('delivery_address')}, ${f.get('delivery_city')}, ${f.get('delivery_state')}`;
+
+  const order={
+    order_number:no,
+    customer_name:f.get('name'),
+    phone:f.get('phone'),
+    email:f.get('email'),
+    address,
+    notes:f.get('notes'),
+    items:c,
+    subtotal,
+    delivery_method:method,
+    delivery_state:method==='home_delivery'?f.get('delivery_state'):null,
+    delivery_city:method==='home_delivery'?f.get('delivery_city'):null,
+    delivery_address:method==='home_delivery'?f.get('delivery_address'):null,
+    delivery_landmark:method==='home_delivery'?f.get('delivery_landmark'):null,
+    delivery_fee:method==='pickup'?0:null,
+    delivery_status:method==='pickup'?'not_required':'quote_pending',
+    payment_status:'unpaid',
+    total:subtotal,
+    status:method==='pickup'?'new':'delivery_quote_pending'
+  };
+
+  if(!configured()||!window.supabase){
+    return toast('The ordering database is not connected.');
+  }
+
+  try{
+    if(!client)client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+    const{error}=await client.from('orders').insert(order);
+    if(error)throw error;
+  }catch(err){
+    console.warn(err);
+    return toast('Could not save the order. Please try again.');
+  }
+
+  localStorage.setItem('gmax_last_order',JSON.stringify({order_number:no,phone:order.phone,total:subtotal,delivery_method:method}));
+  const result=$('#checkout-result');
+  if(result)result.innerHTML=`<div class="order-success"><b>Order created: ${no}</b><br>${method==='home_delivery'?'GMAX will obtain a courier quote before you pay.':'Your current total is '+fmt(subtotal)+'.'}</div>`;
+
+  const lines=c.map(i=>`• ${i.name} × ${i.qty} — ${fmt(i.price*i.qty)}`).join('\n');
+  const deliveryText=method==='home_delivery'
+    ? `HOME DELIVERY\nState: ${order.delivery_state}\nCity/Area: ${order.delivery_city}\nAddress: ${order.delivery_address}\nLandmark: ${order.delivery_landmark||'-'}\nDelivery fee: Awaiting courier quotation\nFinal total: To be confirmed`
+    : `STORE PICKUP\nDelivery fee: ₦0\nTotal: ${fmt(subtotal)}`;
+
+  const text=`Hello GMAX Technology, I have placed an order.\n\nOrder: ${no}\nCustomer: ${order.customer_name}\nPhone: ${order.phone}\n\n${lines}\n\nSubtotal: ${fmt(subtotal)}\n\n${deliveryText}\n\nNotes: ${order.notes||'-'}`;
+  window.open(`https://wa.me/${cfg.WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`,'_blank');
+
+  save([]);
+  renderCart();
+};
+
+if($('#receipt-form'))$('#receipt-form').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.target;
+  const status=$('#receipt-status');
+  const fd=new FormData(form);
+  const file=form.elements.receipt.files[0];
+
+  if(!file)return;
+  const allowed=['image/jpeg','image/png','application/pdf'];
+  if(!allowed.includes(file.type)){
+    status.innerHTML='<div class="notice bad">Please choose a JPG, PNG or PDF receipt.</div>';
+    return;
+  }
+  if(file.size>2.5*1024*1024){
+    status.innerHTML='<div class="notice bad">Receipt is too large. Keep it below 2.5 MB.</div>';
+    return;
+  }
+
+  status.innerHTML='<div class="notice">Sending receipt to GMAX WhatsApp...</div>';
+  const base64=await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result).split(',')[1]);
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+
+  try{
+    const res=await fetch('/api/send-receipt',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        orderNumber:String(fd.get('order_number')||'').trim(),
+        customerName:String(fd.get('customer_name')||'').trim(),
+        phone:String(fd.get('phone')||'').trim(),
+        amountPaid:Number(fd.get('amount_paid')),
+        fileName:file.name,
+        mimeType:file.type,
+        dataBase64:base64
+      })
+    });
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||'Receipt could not be sent.');
+    status.innerHTML='<div class="notice ok"><b>Receipt sent to GMAX WhatsApp.</b><br>Please wait for staff to verify the payment before dispatch.</div>';
+    form.reset();
+  }catch(err){
+    status.innerHTML=`<div class="notice bad">${esc(err.message)}<br>Please contact GMAX on WhatsApp if the problem continues.</div>`;
+  }
+};
+
 count();load()})();
