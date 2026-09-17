@@ -1,1 +1,6 @@
-forgot-password.html.txt
+node_modules/
+.next/
+.env.local
+.env*.local
+.vercel
+*.log
