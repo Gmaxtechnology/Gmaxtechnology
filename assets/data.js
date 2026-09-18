@@ -1,1 +1,0 @@
-window.GMAX_PRODUCTS = [];
