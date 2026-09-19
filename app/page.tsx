@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabaseServer';
 import ProductCarousel from '@/components/ProductCarousel';
+import HeroCarousel from '@/components/HeroCarousel';
 import { Product } from '@/components/ProductCard';
 import { WHATSAPP_NUMBER_1, buildGeneralWhatsAppLink } from '@/lib/whatsapp';
 
@@ -18,11 +19,7 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="relative">
-        <div className="relative w-full aspect-[1896/798] max-h-[520px] overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/hero-gadgets.jpg" alt="GMAX Technologies gadgets" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-navy-dark/10" />
-        </div>
+        <HeroCarousel />
         <div className="bg-navy">
           <div className="max-w-6xl mx-auto px-5 py-6 flex flex-wrap items-center justify-center gap-4">
             <Link href="/products" className="bg-white text-navy px-6 py-2.5 rounded font-medium hover:bg-cream">
