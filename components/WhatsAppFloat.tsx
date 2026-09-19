@@ -24,7 +24,7 @@ export default function WhatsAppFloat() {
             rel="noopener noreferrer"
             className="block py-2 px-3 rounded bg-green-50 hover:bg-green-100 text-charcoal"
           >
-            0816 111 2912
+            0803 395 8523
           </a>
         </div>
       )}
