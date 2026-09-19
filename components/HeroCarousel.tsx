@@ -12,12 +12,14 @@ import { useEffect, useState } from 'react';
 const HERO_IMAGES = [
   '/hero/hero-1.jpg',
   '/hero/hero-2.jpg',
-  // '/hero/hero-3.jpg',
-  // '/hero/hero-4.jpg',
-  // '/hero/hero-5.jpg',
-  // '/hero/hero-6.jpg',
-  // '/hero/hero-7.jpg',
-  // '/hero/hero-8.jpg',
+   '/hero/hero-3.jpg',
+   '/hero/hero-4.jpg',
+   '/hero/hero-5.jpg',
+   '/hero/hero-6.jpg',
+   '/hero/hero-7.jpg',
+   '/hero/hero-8.jpg',
+'/hero/hero-9.jpg',
+'/hero/hero-10.jpg',
 ];
 
 const SLIDE_DURATION_MS = 4500;
