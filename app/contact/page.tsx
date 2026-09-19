@@ -11,7 +11,7 @@ export default function ContactPage() {
         </div>
         <div>
           <h2 className="text-sm font-medium text-charcoal mb-1">Opening Hours</h2>
-          <p>8:00 AM – 10:00 PM (Monday – Friday)</p>
+          <p>8:00 AM – 8:00 PM (Monday – Saturday)</p>
         </div>
         <div>
           <h2 className="text-sm font-medium text-charcoal mb-2">WhatsApp</h2>
@@ -30,7 +30,7 @@ export default function ContactPage() {
               rel="noopener noreferrer"
               className="inline-block w-fit bg-navy text-cream px-5 py-2.5 rounded hover:bg-navy-light"
             >
-              +234 816 111 2912
+              +234 803 395 8523
             </a>
           </div>
         </div>

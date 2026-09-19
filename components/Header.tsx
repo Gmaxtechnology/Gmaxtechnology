@@ -21,7 +21,7 @@ export default function Header() {
         <div className="max-w-6xl mx-auto px-5 h-9 flex items-center justify-between">
           <span className="text-gold">Welcome to GMAX Online Store!</span>
           <span className="hidden sm:inline text-cream/70">
-            Opening Hours: <span className="text-green-400">8:00 AM - 10:00 PM</span> (Monday - Friday)
+            Opening Hours: <span className="text-green-400">8:00 AM - 8:00 PM</span> (Monday - Saturday)
           </span>
         </div>
       </div>
