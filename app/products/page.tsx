@@ -3,7 +3,7 @@ import ProductCard, { Product } from '@/components/ProductCard';
 
 export const revalidate = 60;
 
-const categories = ['Laptops', 'Phones & Tablets', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
+const categories = ['Laptops', 'Desktops', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
 
 export default async function ProductsPage({ searchParams }: { searchParams: { category?: string } }) {
   const supabase = supabaseServer();

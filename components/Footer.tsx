@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { WHATSAPP_NUMBER_1, WHATSAPP_NUMBER_2, buildGeneralWhatsAppLink } from '@/lib/whatsapp';
 
-const categories = ['Laptops', 'Phones & Tablets', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
+const categories = ['Laptops', 'Desktops', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
 
 export default function Footer() {
   return (
@@ -59,7 +59,7 @@ export default function Footer() {
             </li>
             <li>
               <a href={buildGeneralWhatsAppLink(WHATSAPP_NUMBER_2)} target="_blank" rel="noopener noreferrer" className="hover:text-gold">
-                +234 816 111 2912
+                +234 803 395 8523
               </a>
             </li>
             <li className="text-cream/70">10, Oremeji Street, Off Simbiat Abiola Street, Ikeja, Lagos, Nigeria.</li>

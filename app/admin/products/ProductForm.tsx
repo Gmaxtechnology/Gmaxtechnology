@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabaseClient';
 import ImageUploader from '@/components/ImageUploader';
 
-const categories = ['Laptops', 'Phones & Tablets', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
+const categories = ['Laptops', 'Desktops', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
 
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
