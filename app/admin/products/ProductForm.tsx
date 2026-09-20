@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabaseClient';
 import ImageUploader from '@/components/ImageUploader';
+import MultiImageUploader from '@/components/MultiImageUploader';
 
-const categories = ['Laptops', 'Desktops', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
+const categories = ['Laptops', 'Phones & Tablets', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
 
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -13,6 +14,7 @@ function slugify(name: string) {
 export default function ProductForm() {
   const router = useRouter();
   const [form, setForm] = useState({ name: '', description: '', price: '', category: categories[0], image_url: '', in_stock: true });
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,22 +23,41 @@ export default function ProductForm() {
     setSaving(true);
     setError('');
     const supabase = supabaseBrowser();
-    const { error } = await supabase.from('products').insert({
-      name: form.name,
-      slug: slugify(form.name) + '-' + Date.now().toString(36).slice(-4),
-      description: form.description,
-      price: parseFloat(form.price) || 0,
-      category: form.category,
-      image_url: form.image_url || null,
-      in_stock: form.in_stock,
-    });
-    setSaving(false);
-    if (error) {
-      setError(error.message);
-    } else {
-      setForm({ name: '', description: '', price: '', category: categories[0], image_url: '', in_stock: true });
-      router.refresh();
+    const { data: created, error } = await supabase
+      .from('products')
+      .insert({
+        name: form.name,
+        slug: slugify(form.name) + '-' + Date.now().toString(36).slice(-4),
+        description: form.description,
+        price: parseFloat(form.price) || 0,
+        category: form.category,
+        image_url: form.image_url || null,
+        in_stock: form.in_stock,
+      })
+      .select('id')
+      .single();
+
+    if (error || !created) {
+      setSaving(false);
+      setError(error?.message || 'Could not save product.');
+      return;
     }
+
+    if (galleryImages.length > 0) {
+      const { error: galleryError } = await supabase.from('product_images').insert(
+        galleryImages.map((image_url, i) => ({ product_id: created.id, image_url, sort_order: i }))
+      );
+      if (galleryError) {
+        setSaving(false);
+        setError(`Product saved, but the extra photos failed: ${galleryError.message}`);
+        return;
+      }
+    }
+
+    setSaving(false);
+    setForm({ name: '', description: '', price: '', category: categories[0], image_url: '', in_stock: true });
+    setGalleryImages([]);
+    router.refresh();
   }
 
   return (
@@ -52,6 +73,7 @@ export default function ProductForm() {
         {categories.map((c) => <option key={c} value={c}>{c}</option>)}
       </select>
       <ImageUploader value={form.image_url} onUploaded={(url) => setForm({ ...form, image_url: url })} />
+      <MultiImageUploader images={galleryImages} onChange={setGalleryImages} />
       <label className="flex items-center gap-2 text-sm text-charcoal">
         <input type="checkbox" checked={form.in_stock} onChange={(e) => setForm({ ...form, in_stock: e.target.checked })} />
         In stock

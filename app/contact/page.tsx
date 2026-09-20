@@ -11,7 +11,7 @@ export default function ContactPage() {
         </div>
         <div>
           <h2 className="text-sm font-medium text-charcoal mb-1">Opening Hours</h2>
-          <p>8:00 AM – 8:00 PM (Monday – Saturday)</p>
+          <p>8:00 AM – 10:00 PM (Monday – Friday)</p>
         </div>
         <div>
           <h2 className="text-sm font-medium text-charcoal mb-2">WhatsApp</h2>

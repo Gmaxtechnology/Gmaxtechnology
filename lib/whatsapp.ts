@@ -4,7 +4,7 @@
 // official WhatsApp Business Cloud API, which needs Meta business approval.
 
 export const WHATSAPP_NUMBER_1 = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER_1 || '2348028494730';
-export const WHATSAPP_NUMBER_2 = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER_2 || '2348161112912';
+export const WHATSAPP_NUMBER_2 = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER_2 || '2348033958523';
 
 export function buildOrderWhatsAppLink(opts: {
   number?: string;

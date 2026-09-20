@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabaseServer';
 import AddToCartButton from './AddToCartButton';
+import ProductGallery from './ProductGallery';
 
 export const revalidate = 60;
 
@@ -10,16 +11,20 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
   if (!product) notFound();
 
+  const { data: extraImages } = await supabase
+    .from('product_images')
+    .select('image_url')
+    .eq('product_id', product.id)
+    .order('sort_order');
+
+  const galleryImages = [
+    ...(product.image_url ? [product.image_url] : []),
+    ...(extraImages || []).map((i: any) => i.image_url),
+  ];
+
   return (
     <div className="max-w-4xl mx-auto px-5 py-14 grid sm:grid-cols-2 gap-10">
-      <div className="aspect-square bg-cream rounded-lg flex items-center justify-center overflow-hidden">
-        {product.image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-navy/30 text-sm">No image yet</span>
-        )}
-      </div>
+      <ProductGallery images={galleryImages} productName={product.name} />
       <div>
         {product.category && <span className="text-xs text-gold-dark uppercase tracking-wide">{product.category}</span>}
         <h1 className="font-display text-3xl text-navy mt-1 mb-3">{product.name}</h1>
