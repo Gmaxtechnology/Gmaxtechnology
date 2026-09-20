@@ -5,7 +5,7 @@ import { supabaseBrowser } from '@/lib/supabaseClient';
 import ImageUploader from '@/components/ImageUploader';
 import MultiImageUploader from '@/components/MultiImageUploader';
 
-const categories = ['Laptops', 'Phones & Tablets', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
+const categories = ['Laptops', 'Desktop Pc', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
 
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

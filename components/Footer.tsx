@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { WHATSAPP_NUMBER_1, WHATSAPP_NUMBER_2, buildGeneralWhatsAppLink } from '@/lib/whatsapp';
 
-const categories = ['Laptops', 'Phones & Tablets', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
+const categories = ['Laptops', 'Desktop Pc', 'Office Equipment', 'Home Appliances', 'Networking Gadgets'];
 
 export default function Footer() {
   return (
